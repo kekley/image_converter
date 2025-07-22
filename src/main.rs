@@ -1,7 +1,7 @@
 #![windows_subsystem = "windows"]
 use std::{error::Error, io::Cursor};
 
-use egui::{IconData, Vec2, ViewportBuilder};
+use eframe::egui::{IconData, Vec2, ViewportBuilder};
 use image::ImageReader;
 use image_converter::app::image_conversion::ImageConverter;
 
@@ -21,7 +21,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         viewport: ViewportBuilder::default()
             .with_title("Image Converter")
             .with_min_inner_size(Vec2::new(1000.0, 800.0))
-            .with_icon(icon),
+            .with_icon(icon)
+            .with_drag_and_drop(true),
 
         vsync: true,
 

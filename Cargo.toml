@@ -4,9 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-eframe = "0.32.0"
-egui = "0.32.0"
-fast_image_resize = { version = "5.2.0", features = ["image", "rayon"] }
+eframe = {version = "0.32.0",default-features = false, features = ["glow","wayland","x11","default_fonts"]}
+fast_image_resize = { version = "5.2.0", features = [ "rayon"] }
 image = "0.25.6"
 rfd = "0.15.4"
 

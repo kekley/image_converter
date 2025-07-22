@@ -1,15 +1,16 @@
 use crate::image::image_crate::{DynImageReader, DynImageWriter};
 use crate::image::{Image, ImageFormat, ImageReader, ImageWriter};
 use crate::resize::Resizer;
+use eframe::egui;
 use std::sync::Arc;
 use std::{cell::RefCell, error::Error, path::PathBuf, thread::JoinHandle};
 
-use eframe::{App, CreationContext};
-use egui::{
+use eframe::egui::{
     Button, Checkbox, Color32, ColorImage, ComboBox, DragValue, Image as EguiImage, ImageData,
     Label, RichText, Sense, Separator, TextEdit, TextureHandle, load::SizedTexture,
 };
-use egui::{Context, TextBuffer, TextureOptions};
+use eframe::egui::{Context, TextBuffer, TextureOptions};
+use eframe::{App, CreationContext};
 
 use crate::{
     image::rgba_image::LoadedRgbaImage,
@@ -116,6 +117,18 @@ impl Default for ImageConverter {
 
 impl App for ImageConverter {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        ctx.input(|r| {
+            r.raw.dropped_files.iter().for_each(|file| {
+                println!("hi");
+                dbg!(file);
+            });
+        });
+        ctx.input(|r| {
+            r.raw.hovered_files.iter().for_each(|file| {
+                println!("hi");
+                dbg!(file);
+            });
+        });
         egui::TopBottomPanel::top("File Panel").show(ctx, |ui| {
             let available_width = ui.available_width();
             egui::Sides::new()
@@ -448,45 +461,6 @@ impl App for ImageConverter {
                 );
         });
 
-        egui::CentralPanel::default().show(ctx, |ui| {
-            let separator_size = 5.0;
-            let width = ui.available_width() - separator_size;
-            let height = ui.available_height();
-            let half_width = width / 2.0;
-
-            ui.horizontal(|ui| {
-                let (left_rect, _left_response) =
-                    ui.allocate_exact_size([half_width, height].into(), Sense::empty());
-                let (separator_rect, _) =
-                    ui.allocate_exact_size([separator_size, height].into(), Sense::empty());
-                let (right_rect, _right_response) =
-                    ui.allocate_exact_size([half_width, height].into(), Sense::empty());
-
-                if let Some(texture_handle) = &self.source_preview {
-                    ui.put(
-                        left_rect,
-                        EguiImage::new(SizedTexture::from_handle(texture_handle))
-                            .maintain_aspect_ratio(true)
-                            .max_width(half_width)
-                            .max_height(height),
-                    );
-                }
-                ui.put(
-                    separator_rect,
-                    Separator::default().vertical().spacing(separator_size),
-                );
-
-                if let Some(texture_handle) = &self.output_preview {
-                    ui.put(
-                        right_rect,
-                        EguiImage::new(SizedTexture::from_handle(texture_handle))
-                            .maintain_aspect_ratio(true)
-                            .max_width(half_width)
-                            .max_height(height),
-                    );
-                }
-            });
-        });
         if let Some(src_fd) = self.load_file_dialogue.take() {
             if src_fd.is_finished() {
                 match src_fd.join() {
@@ -607,5 +581,45 @@ impl App for ImageConverter {
                 }
             }
         }
+
+        egui::CentralPanel::default().show(ctx, |ui| {
+            let separator_size = 5.0;
+            let width = ui.available_width() - separator_size;
+            let height = ui.available_height();
+            let half_width = width / 2.0;
+
+            ui.horizontal(|ui| {
+                let (left_rect, _left_response) =
+                    ui.allocate_exact_size([half_width, height].into(), Sense::empty());
+                let (separator_rect, _) =
+                    ui.allocate_exact_size([separator_size, height].into(), Sense::empty());
+                let (right_rect, _right_response) =
+                    ui.allocate_exact_size([half_width, height].into(), Sense::empty());
+
+                if let Some(texture_handle) = &self.source_preview {
+                    ui.put(
+                        left_rect,
+                        EguiImage::new(SizedTexture::from_handle(texture_handle))
+                            .maintain_aspect_ratio(true)
+                            .max_width(half_width)
+                            .max_height(height),
+                    );
+                }
+                ui.put(
+                    separator_rect,
+                    Separator::default().vertical().spacing(separator_size),
+                );
+
+                if let Some(texture_handle) = &self.output_preview {
+                    ui.put(
+                        right_rect,
+                        EguiImage::new(SizedTexture::from_handle(texture_handle))
+                            .maintain_aspect_ratio(true)
+                            .max_width(half_width)
+                            .max_height(height),
+                    );
+                }
+            });
+        });
     }
 }
