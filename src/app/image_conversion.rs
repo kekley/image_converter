@@ -1,7 +1,7 @@
 use crate::image::image_crate::{DynImageReader, DynImageWriter};
 use crate::image::{Image, ImageFormat, ImageReader, ImageWriter};
 use crate::resize::Resizer;
-use eframe::egui;
+use eframe::egui::{self, Rect};
 use std::sync::Arc;
 use std::{cell::RefCell, error::Error, path::PathBuf, thread::JoinHandle};
 
@@ -117,18 +117,6 @@ impl Default for ImageConverter {
 
 impl App for ImageConverter {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        ctx.input(|r| {
-            r.raw.dropped_files.iter().for_each(|file| {
-                println!("hi");
-                dbg!(file);
-            });
-        });
-        ctx.input(|r| {
-            r.raw.hovered_files.iter().for_each(|file| {
-                println!("hi");
-                dbg!(file);
-            });
-        });
         egui::TopBottomPanel::top("File Panel").show(ctx, |ui| {
             let available_width = ui.available_width();
             egui::Sides::new()
@@ -583,6 +571,20 @@ impl App for ImageConverter {
         }
 
         egui::CentralPanel::default().show(ctx, |ui| {
+            ctx.input(|r| {
+                r.raw.dropped_files.iter().for_each(|file| {
+                    println!("hi");
+                    dbg!(file);
+                    ui.painter()
+                        .rect_filled(Rect::EVERYTHING, 0.0, Color32::GREEN);
+                });
+            });
+            ctx.input(|r| {
+                r.raw.hovered_files.iter().for_each(|file| {
+                    println!("hi");
+                    dbg!(file);
+                });
+            });
             let separator_size = 5.0;
             let width = ui.available_width() - separator_size;
             let height = ui.available_height();
